@@ -275,7 +275,7 @@ class HeapPriorityQueue(PriorityQueue):
 
     def __init__(self, capacity):
 
-        self.__data = [(None, -inf)] * capacity
+        self.__data = [(None, inf)] + [(None, -inf)] * capacity
         self.__end_index = 0
     
     # Methods
@@ -312,7 +312,7 @@ class HeapPriorityQueue(PriorityQueue):
 
             self.__data[problem_index//2] = temp
     
-    def enqueue(self, items):
+    def enqueue(self, *items):
 
         for item in items:
 
@@ -320,4 +320,47 @@ class HeapPriorityQueue(PriorityQueue):
 
     def dequeue(self):
 
-        pass # IMPLEMENT
+        item = self.top()
+
+        self.__data[1] = self.__data[self.__end_index]
+        self.__data[self.__end_index] = (None, -inf)
+
+        problem_index = 1
+
+        max_priority = -inf
+
+        max_index = 1
+        
+        for index in [problem_index, problem_index * 2, problem_index * 2 + 1]:
+
+            if index < len(self.__data):
+
+                if self.__data[index][1] > max_priority:
+
+                    max_priority = self.__data[index][1]
+                    max_index = index
+
+        while max_index != problem_index:
+
+            temp = self.__data[max_index]
+            self.__data[max_index] = self.__data[problem_index]
+            self.__data[problem_index] = temp
+
+            problem_index = max_index
+
+            max_priority = -inf
+
+            max_index = 1
+            
+            for index in [problem_index, problem_index * 2, problem_index * 2 + 1]:
+
+                if index < len(self.__data):
+
+                    if self.__data[index][1] > max_priority:
+
+                        max_priority = self.__data[index][1]
+                        max_index = index
+        
+        self.__end_index -= 1
+        
+        return item
