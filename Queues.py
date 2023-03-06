@@ -1,3 +1,5 @@
+from math import inf
+
 class QueueError(Exception):
 
     pass
@@ -17,7 +19,10 @@ class Queue():
     def front(self):
         pass
 
-    def enqueue(self, item):
+    def __enqueue_single(self, item):
+        pass
+
+    def enqueue(self, *items):
         pass
 
     def dequeue(self):
@@ -93,29 +98,28 @@ class ReuseableLinearQueue(Queue):
             raise QueueError("Cannot access front of empty queue")
 
         return self.__data[self.__head]
+    
+    def __shuffle_to_front(self):
+
+        if self.__head == 0:
+
+                raise QueueError("Cannot enqueue to queue beyond capacity")
+            
+        offset = self.__head
+        index = self.__head
+        
+        for i in range(index, len(self.__data)):
+
+            self.__data[i-offset] = self.__data[i]
+        
+        self.__head -= offset
+        self.__tail -= offset
 
     def __enqueue_single(self, item):
 
         if self.__tail == len(self.__data)-1:
 
-            if self.__head == 0:
-
-                raise QueueError("Cannot enqueue to queue beyond capacity")
-            
-            offset = 0
-            index = 1
-
-            while self.__data[index] is None:
-
-                offset += 1
-                index += 1
-            
-            for i in range(index, len(self.__data)):
-
-                self.__data[i-offset] = self.__data[i]
-            
-            self.__head -= offset
-            self.__tail -= offset
+            self.__shuffle_to_front()
         
         self.__tail += 1
         self.__data[self.__tail] = item
@@ -130,7 +134,6 @@ class ReuseableLinearQueue(Queue):
         
         item = self.front()
 
-        self.__data[self.__head] = None
         self.__head += 1
 
         return item
@@ -190,3 +193,131 @@ class CircularQueue(Queue):
         self.__count -= 1
 
         return item
+
+class PriorityQueue():
+
+    # Constructor
+
+    def __init__(self, capacity):
+        pass
+
+    # Methods
+
+    def is_empty(self):
+        pass
+
+    def top(self):
+        pass
+
+    def __enqueue_single(self, item, priority):
+        pass
+
+    def enqueue(self, *items):
+        pass
+
+    def dequeue(self):
+        pass
+
+class NaivePriorityQueue(PriorityQueue):
+
+    # Constructor
+
+    def __init__(self, capacity):
+
+        self.__data = [(None, -inf)] * capacity
+    
+    # Methods
+
+    def is_empty(self):
+
+        return self.__data[0][1] == -inf
+    
+    def top(self):
+
+        if self.is_empty():
+
+            raise QueueError("Cannot access top of empty priority queue")
+
+        return self.__data[0][0]
+
+    def __enqueue_single(self, item, priority):
+
+        if self.__data[len(self.__data)-1][1] != -inf:
+
+            raise QueueError("Cannot enqueue to queue beyond capacity")
+
+        index = 0
+
+        while self.__data[index][1] >= priority:
+
+            index += 1
+        
+        self.__data = self.__data[:index] + \
+            [(item, priority)] + self.__data[index:-1]
+    
+    def enqueue(self, *items):
+
+        for item in items:
+
+            self.__enqueue_single(item[0], item[1])
+    
+    def dequeue(self):
+
+        item = self.top()
+
+        self.__data = self.__data[1:] + [(None, -inf)]
+
+        return item
+    
+class HeapPriorityQueue(PriorityQueue):
+
+    # Constructor
+
+    def __init__(self, capacity):
+
+        self.__data = [(None, -inf)] * capacity
+        self.__end_index = 0
+    
+    # Methods
+
+    def is_empty(self):
+
+        return self.__end_index == 0
+    
+    def top(self):
+
+        if self.is_empty():
+
+            raise QueueError("Cannot access top of empty priority queue")
+        
+        return self.__data[1][0]
+
+    def __enqueue_single(self, item, priority):
+
+        self.__end_index += 1
+
+        if self.__end_index == len(self.__data):
+
+            raise QueueError("Cannot enqueue to queue beyond capacity")
+
+        self.__data[self.__end_index] = (item, priority)
+
+        problem_index = self.__end_index
+
+        while self.__data[problem_index][1] > self.__data[problem_index//2][1]:
+
+            temp = self.__data[problem_index]
+
+            self.__data[problem_index] = self.__data[problem_index//2]
+
+            self.__data[problem_index//2] = temp
+    
+    def enqueue(self, items):
+
+        for item in items:
+
+            self.__enqueue_single(item[0], item[1])
+
+    def dequeue(self):
+
+        pass # IMPLEMENT
