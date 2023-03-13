@@ -311,6 +311,8 @@ class HeapPriorityQueue(PriorityQueue):
             self.__data[problem_index] = self.__data[problem_index//2]
 
             self.__data[problem_index//2] = temp
+
+            problem_index //= 2
     
     def enqueue(self, *items):
 
@@ -364,3 +366,7 @@ class HeapPriorityQueue(PriorityQueue):
         self.__end_index -= 1
         
         return item
+
+q = HeapPriorityQueue(8)
+q.enqueue((5,5),(3,3),(2,2),(8,8))
+print(q.dequeue())
