@@ -111,6 +111,7 @@ class OpenCustomHashTable(HashTable):
         while self.__data[index][0] is not None:
 
             print(index, self.__data[index])
+            print(self.__spare_stack._Stack__data)
 
             prev_index = index
 
@@ -123,10 +124,12 @@ class OpenCustomHashTable(HashTable):
                 if self.__spare_stack.is_empty():
 
                     self.__spare_stack.push(index+1)
+                
+                break
         
         try:
 
-            self.__data[index] = (item, prev_index, None)
+            self.__data[index] = (item, None, prev_index)
 
             if prev_index is not None:
 
@@ -163,10 +166,12 @@ class OpenCustomHashTable(HashTable):
             prev = self.__data[index][2]
             self.__data[prev] = (self.__data[prev][0], \
                 new_next, self.__data[prev][2])
+            
+            self.__spare_stack.push(index)
         
 
         temp_data = [x for x in self.__data[index]]
-        self.__data[index] = (None, None, None)
+        self.__data[index] = (self.__data[index][0], None, None)
 
         if index < self.__MAX:
 
@@ -174,7 +179,8 @@ class OpenCustomHashTable(HashTable):
 
             if replacement_ind is not None:
 
-                self.__data[index] = [x for x in self.__data[replacement_ind]]
+                self.__data[index] = (self.__data[replacement_ind][0], \
+                    self.__data[replacement_ind][1], None)
 
                 self.__spare_stack.push(replacement_ind)
     
@@ -185,3 +191,13 @@ h.insert(37, 91, 22, 51, 82, 31)
 print(h.contains(51))
 print("REMOVAL")
 h.remove(82, 91)
+h.remove(51)
+print(h.contains(51))
+print(h.contains(31))
+print("INSERTION")
+h.insert(111, 131, 151)
+print("TABLE")
+d = h._OpenCustomHashTable__data
+for i, x in enumerate(d):
+    print(i, x)
+print(h._OpenCustomHashTable__spare_stack._Stack__data)
