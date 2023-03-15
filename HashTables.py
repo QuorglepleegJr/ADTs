@@ -183,6 +183,30 @@ class OpenCustomHashTable(HashTable):
                     self.__data[replacement_ind][1], None)
 
                 self.__spare_stack.push(replacement_ind)
+
+class ClosedCustomHashTable(HashTable):
+
+    def __init__(self, capacity, hash=None):
+
+        self.__data = [None] * capacity
+        
+        if hash is None:
+
+            hash = lambda x: x%capacity
+        
+        self.__hash = hash
+    
+    def contains(self, item):
+
+        pass
+
+    def insert(self, item):
+
+        pass
+
+    def remove(self, item):
+        
+        pass
     
 h = OpenCustomHashTable(20)
 print(h.contains(51))
