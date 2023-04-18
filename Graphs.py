@@ -6,7 +6,15 @@ class Graph():
 
         edges = set()
         
-        for x in range(int(input("Enter number of edges: "))):
+        edge_no = int(input("Enter number of edges: "))
+
+        if edge_no == num * (num-1):
+
+            print("Creating complete graph")
+
+            return Graph.new_complete(num)
+
+        for x in range():
 
             a = int(input(f"Edge {x+1} Start: "))
             b = int(input(f"Edge {x+1} End: "))
@@ -14,6 +22,12 @@ class Graph():
             edges.add((a,b))
         
         return Graph(num, *edges)
+
+    def new_complete(n):
+
+        edges = {(a,b) for a in range(n) for b in range(n) if a != b}
+
+        return Graph(n, *edges)
     
     def __init__(self, num_vertices, *edges):
         
@@ -34,9 +48,19 @@ class Graph():
 
         l = [[] for _ in range(self.__num_vertices)]
 
-        pass
+        for edge in self.__edges:
+
+            l[edge[0]].append(edge[1])
+        
+        for connections in l:
+
+            connections.sort()
+        
+        return l
     
     def print_matrix(self):
+
+        print("Matrix:\n")
 
         print(" "+" "*len(str(self.__num_vertices))+"| ", end="")
 
@@ -57,11 +81,22 @@ class Graph():
                 print(str(item)+" "*(len(str(self.__num_vertices))), end="")
             
             print()
+        
+        print("\n")
     
     def print_list(self):
 
-        pass
+        print("List:\n")
+
+        for index, connections in enumerate(self.adj_list()):
+
+            print(str(index) + " "*(len(str(self.__num_vertices)) \
+                - len(str(index))) + " | ", end="")
+            print(*connections, sep=", ")
+        
+        print("\n")
 
 g = Graph.from_console()
 
+g.print_list()
 g.print_matrix()
