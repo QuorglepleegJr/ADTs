@@ -1,3 +1,5 @@
+b[37,12,81,19,26,46,51,14]
+b[15,19,26,7,4,13,18,16,2,9]
 ["A","E","C","X",None,"D","Q",None,None,None,None,None,None,"R"]
 [40,33,51,17,None,64,57,4,None,None,None,None,None,55,None,1,12]
 ["x","+","-",7,"x",9,4,None,None,3,2]
