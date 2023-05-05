@@ -92,7 +92,7 @@ class Graph():
     
     def print_matrix(self):
 
-        print("Matrix:\n")
+        print("\nMatrix:\n")
 
         print(" "+" "*len(str(self.__num_vertices))+"| ", end="")
 
@@ -118,7 +118,7 @@ class Graph():
     
     def print_list(self):
 
-        print("List:\n")
+        print("\nList:\n")
 
         for index, connections in enumerate(self.adj_list()):
 
@@ -134,35 +134,85 @@ class Graph():
 
         print(", ".join([str(n) for n in visited]))
     
-    def get_shortest_path(self, start=0, end=1):
+    def __printless_get_shortest_path(self, start, end):
 
-        distances, parents = self.bfs(start)
+        distances, parents = self.bfs(start)[1:]
 
-        if distances[end] == inf:
+        if distances[end] == inf: return None
 
-            print(f"No path exists between {start} and {end}")
-            print()
-
-            return
-
-        print(f"Shortest path between {start} and {end}:")
-        print(f"Length {distances[end]}")
-
-        path = []
+        path = [end]
 
         current = end
 
         while parents[current] is not None:
-
-            path = [current] + path
             
             current = parents[current]
+
+            path = [current] + path
         
-        print(" -> ".join([str(n) for n in path]))
-        print()
-    
         return distances[end], path
+
+    def get_shortest_path(self, start=0, end=1):
+
+        shortest_path = self.__printless_get_shortest_path(start, end)
+
+        if shortest_path is None:
+
+            print(f"No path exists between {start} and {end}")
+            print()
+
+        print(f"Shortest path between {start} and {end}:")
+        print(f"Length {shortest_path[0]}")
+        print(" -> ".join([str(n) for n in shortest_path[1]]))
+        print()
+
+        return shortest_path
+    
+    def get_all_shortest_paths(self, start=0):
+
+        print(f"\nAll shortest paths from {start}:\n")
+
+        distances, parents = self.bfs(start)[1:]
+
+        paths = []
+
+        for end in range(self.__num_vertices):
+
+            if end != start:
+
+                if distances[end] != inf:
+
+                    path = [end]
+
+                    current = end
+
+                    while parents[current] is not None:
+            
+                        current = parents[current]
+
+                        path = [current] + path
+
+                    print(f"{end} | {distances[end]} | " + \
+                        " -> ".join([str(n) for n in path]))
+                    
+                    paths.append((end, distances[end], path))
+                
+                else:
+
+                    print(f"{end} | No path")
+                    paths.append((end, None))
+        
+        print()
+
+        return paths
+
+        
+
+        
+                
 
 g = Graph.from_console()
 
-g.get_shortest_path()
+g.print_matrix()
+
+g.get_all_shortest_paths()
