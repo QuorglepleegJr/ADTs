@@ -1,4 +1,5 @@
 from Queues import LinearQueue
+from Stacks import Stack
 from math import inf
 
 class Graph():
@@ -44,12 +45,12 @@ class Graph():
         adj_list = self.adj_list()
 
         visit_q = LinearQueue(self.__num_vertices)
+        visit_q.enqueue(start)
         visited = [start]
         distances = [inf] * self.__num_vertices
         distances[start] = 0
         parents = [None] * self.__num_vertices
 
-        visit_q.enqueue(start)
 
         while not visit_q.is_empty():
 
@@ -65,6 +66,72 @@ class Graph():
                     parents[other] = current
         
         return visited, distances, parents
+    
+    def dfs(self, start=0):
+
+        adj_list = self.adj_list()
+
+        visit_stack = Stack()
+        visit_stack.push(start)
+        visited = []
+        starts = [None] * self.__num_vertices
+        ends = [None] * self.__num_vertices
+        parents = [None] * self.__num_vertices
+
+        counter = 0
+
+        self.print_list()
+
+        while not visit_stack.is_empty():
+
+            current = visit_stack.pop()
+
+            if current not in visited:
+
+                starts[current] = counter
+                counter += 1
+
+                visited.append(current)
+
+                others = [x for x in adj_list[current] if x not in visited]
+                
+                for i in range(len(others)-1, -1, -1):
+
+                    visit_stack.push(others[i])
+                    parents[others[i]] = current
+                
+                if len(others) == 0:
+                
+                    parent = parents[current]
+                    child = current
+
+                    ends[current] = counter
+                    counter += 1
+                    
+                    while parent is not None:
+                        
+                        for p in adj_list[child]:
+
+                            print(child, p, adj_list)
+
+                            if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
+
+                                adj_list[p].pop()
+                            
+                            elif len(adj_list[p]) > 0:
+
+                                if p == parent:
+
+                                    break
+
+                        ends[parent] = counter
+                        counter += 1
+
+                        child = parent
+                        parent = parents[child]
+                        
+        
+        return visited, starts, ends, parents
 
     def matrix(self):
 
@@ -134,7 +201,7 @@ class Graph():
 
         print(", ".join([str(n) for n in visited]))
     
-    def __printless_get_shortest_path(self, start, end):
+    def get_shortest_path(self, start=0, end=1):
 
         distances, parents = self.bfs(start)[1:]
 
@@ -152,9 +219,9 @@ class Graph():
         
         return distances[end], path
 
-    def get_shortest_path(self, start=0, end=1):
+    def print_shortest_path(self, start=0, end=1):
 
-        shortest_path = self.__printless_get_shortest_path(start, end)
+        shortest_path = self.get_shortest_path(start, end)
 
         if shortest_path is None:
 
@@ -168,9 +235,7 @@ class Graph():
 
         return shortest_path
     
-    def get_all_shortest_paths(self, start=0):
-
-        print(f"\nAll shortest paths from {start}:\n")
+    def get_all_shortest_paths_from_node(self, start=0):
 
         distances, parents = self.bfs(start)[1:]
 
@@ -191,20 +256,34 @@ class Graph():
                         current = parents[current]
 
                         path = [current] + path
-
-                    print(f"{end} | {distances[end]} | " + \
-                        " -> ".join([str(n) for n in path]))
                     
                     paths.append((end, distances[end], path))
                 
                 else:
 
-                    print(f"{end} | No path")
-                    paths.append((end, None))
+                    paths.append((end, inf, None))
         
         print()
 
         return paths
+
+    def print_all_shortest_paths_from_node(self, start=0):
+
+        paths = self.get_all_shortest_paths_from_node(start)
+
+        print(f"\nAll shortest paths from {start}:\n")
+
+        for end, distance, path in paths:
+
+            if distance != inf:
+
+                 print(f"{end} | {distance} | " + \
+                     " -> ".join([str(n) for n in path]))
+            
+            else:
+
+                
+                 print(f"{end} | No path")
 
         
 
@@ -213,6 +292,6 @@ class Graph():
 
 g = Graph.from_console()
 
-g.print_matrix()
+g.print_list()
 
-g.get_all_shortest_paths()
+g.print_all_shortest_paths_from_node()
