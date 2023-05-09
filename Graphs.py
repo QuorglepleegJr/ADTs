@@ -67,6 +67,60 @@ class Graph():
         
         return visited, distances, parents
     
+    def get_shortest_path(self, start=0, end=1):
+
+        distances, parents = self.bfs(start)[1:]
+
+        if distances[end] == inf: return None
+
+        path = [end]
+
+        current = end
+
+        while parents[current] is not None:
+            
+            current = parents[current]
+
+            path = [current] + path
+        
+        return distances[end], path
+
+    def get_all_shortest_paths_from_node(self, start=0):
+
+        distances, parents = self.bfs(start)[1:]
+
+        paths = []
+
+        for end in range(self.__num_vertices):
+
+            if end != start:
+
+                if distances[end] != inf:
+
+                    path = [end]
+
+                    current = end
+
+                    while parents[current] is not None:
+            
+                        current = parents[current]
+
+                        path = [current] + path
+                    
+                    paths.append((end, distances[end], path))
+                
+                else:
+
+                    paths.append((end, inf, None))
+        
+        print()
+
+        return paths
+
+    def get_all_shortest_paths(self):
+
+        pairs = [(a,b) for a in range(self.__num_vertices) for b in range(self.__num_vertices) if a != b]
+    
     def dfs(self, start=0):
 
         adj_list = self.adj_list()
@@ -200,24 +254,6 @@ class Graph():
         visited = self.bfs(start)[0]
 
         print(", ".join([str(n) for n in visited]))
-    
-    def get_shortest_path(self, start=0, end=1):
-
-        distances, parents = self.bfs(start)[1:]
-
-        if distances[end] == inf: return None
-
-        path = [end]
-
-        current = end
-
-        while parents[current] is not None:
-            
-            current = parents[current]
-
-            path = [current] + path
-        
-        return distances[end], path
 
     def print_shortest_path(self, start=0, end=1):
 
@@ -234,38 +270,6 @@ class Graph():
         print()
 
         return shortest_path
-    
-    def get_all_shortest_paths_from_node(self, start=0):
-
-        distances, parents = self.bfs(start)[1:]
-
-        paths = []
-
-        for end in range(self.__num_vertices):
-
-            if end != start:
-
-                if distances[end] != inf:
-
-                    path = [end]
-
-                    current = end
-
-                    while parents[current] is not None:
-            
-                        current = parents[current]
-
-                        path = [current] + path
-                    
-                    paths.append((end, distances[end], path))
-                
-                else:
-
-                    paths.append((end, inf, None))
-        
-        print()
-
-        return paths
 
     def print_all_shortest_paths_from_node(self, start=0):
 
@@ -281,7 +285,6 @@ class Graph():
                      " -> ".join([str(n) for n in path]))
             
             else:
-
                 
                  print(f"{end} | No path")
 
