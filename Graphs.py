@@ -1,4 +1,5 @@
 from Queues import LinearQueue
+from Stacks import Stack
 from math import inf
 
 class Graph():
@@ -44,12 +45,12 @@ class Graph():
         adj_list = self.adj_list()
 
         visit_q = LinearQueue(self.__num_vertices)
+        visit_q.enqueue(start)
         visited = [start]
         distances = [inf] * self.__num_vertices
         distances[start] = 0
         parents = [None] * self.__num_vertices
 
-        visit_q.enqueue(start)
 
         while not visit_q.is_empty():
 
@@ -65,6 +66,72 @@ class Graph():
                     parents[other] = current
         
         return visited, distances, parents
+    
+    def dfs(self, start=0):
+
+        adj_list = self.adj_list()
+
+        visit_stack = Stack()
+        visit_stack.push(start)
+        visited = []
+        starts = [None] * self.__num_vertices
+        ends = [None] * self.__num_vertices
+        parents = [None] * self.__num_vertices
+
+        counter = 0
+
+        self.print_list()
+
+        while not visit_stack.is_empty():
+
+            current = visit_stack.pop()
+
+            if current not in visited:
+
+                starts[current] = counter
+                counter += 1
+
+                visited.append(current)
+
+                others = [x for x in adj_list[current] if x not in visited]
+                
+                for i in range(len(others)-1, -1, -1):
+
+                    visit_stack.push(others[i])
+                    parents[others[i]] = current
+                
+                if len(others) == 0:
+                
+                    parent = parents[current]
+                    child = current
+
+                    ends[current] = counter
+                    counter += 1
+                    
+                    while parent is not None:
+                        
+                        for p in adj_list[child]:
+
+                            print(child, p, adj_list)
+
+                            if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
+
+                                adj_list[p].pop()
+                            
+                            elif len(adj_list[p]) > 0:
+
+                                if p == parent:
+
+                                    break
+
+                        ends[parent] = counter
+                        counter += 1
+
+                        child = parent
+                        parent = parents[child]
+                        
+        
+        return visited, starts, ends, parents
 
     def matrix(self):
 
@@ -140,13 +207,7 @@ class Graph():
 
         if distances[end] == inf:
 
-            print(f"No path exists between {start} and {end}")
-            print()
-
-            return
-
-        print(f"Shortest path between {start} and {end}:")
-        print(f"Length {distances[end]}")
+            return inf, []
 
         path = []
 
@@ -157,12 +218,32 @@ class Graph():
             path = [current] + path
             
             current = parents[current]
-        
-        print(" -> ".join([str(n) for n in path]))
-        print()
     
         return distances[end], path
 
+    def print_shortest_path(self, start=0, end=1):
+
+        distance, path = self.get_shortest_path(start, end)
+
+        if distance == inf:
+
+            print(f"No path exists between {start} and {end}")
+            print()
+
+        else:
+
+            print(f"Shortest path between {start} and {end}:")
+            print(f"Length {distance}")
+            print(" -> ".join([str(n) for n in path]))
+            print()
+    
+    def get_all_shortests_to_node(self, start=0):
+
+        pass
+
+    
+
+
 g = Graph.from_console()
 
-g.get_shortest_path()
+print(g.dfs())
