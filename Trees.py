@@ -198,7 +198,7 @@ class BinaryExpressionTree(BinaryTree):
 
         for element in string[1:-1].split(","):
 
-            
+            pass
     
     def _from_rpn_array(array):
 

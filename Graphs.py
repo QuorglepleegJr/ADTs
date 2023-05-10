@@ -181,7 +181,16 @@ class DirectedGraph(Graph):
 
     def get_all_shortest_paths(self):
 
-        pairs = [(a,b) for a in range(self.__num_vertices) for b in range(self.__num_vertices) if a != b]
+        pairs = [(a,b) for a in range(self.__num_vertices) \
+            for b in range(self.__num_vertices) if a != b]
+        
+        paths = []
+
+        for pair in pairs:
+
+            paths.append((pair, self.get_shortest_path(*pair)))
+        
+        return paths
     
     def dfs(self, start=0):
 
@@ -349,6 +358,12 @@ class DirectedGraph(Graph):
             else:
                 
                  print(f"{end} | No path")
+    
+    def print_all_shortest_paths(self):
+
+        paths = self.get_all_shortest_paths()
+
+        for path A
 
         
 class UndirectedGraph(DirectedGraph):
@@ -387,9 +402,7 @@ class UndirectedGraph(DirectedGraph):
 
 g = UndirectedGraph.from_console()
 
-print(g)
-
 g.print_list()
 g.print_matrix()
 
-g.print_all_shortest_paths_from_node()
+print(g.get_all_shortest_paths())
