@@ -6,7 +6,69 @@ class Graph():
 
     def from_console():
 
-        # Takes input for directed, add both directions for undirected
+        pass
+
+    def new_complete(n):
+
+        pass
+    
+    def __init__(self, num_vertices, *edges):
+        
+        pass
+    
+    def bfs(self, start=0):
+
+        pass
+    
+    def get_shortest_path(self, start=0, end=1):
+
+        pass
+
+    def get_all_shortest_paths_from_node(self, start=0):
+
+        pass
+
+    def get_all_shortest_paths(self):
+
+        pass
+    
+    def dfs(self, start=0):
+
+        pass
+
+    def matrix(self):
+
+        pass
+
+    def adj_list(self):
+
+        pass
+    
+    def print_matrix(self):
+
+        pass
+    
+    def print_list(self):
+
+        pass
+    
+    def print_bfs_order(self, start=0):
+
+        pass
+
+    def print_shortest_path(self, start=0, end=1):
+
+        pass
+
+    def print_all_shortest_paths_from_node(self, start=0):
+
+        pass
+
+class DirectedGraph(Graph):
+
+    def from_console():
+
+        # Takes input for directed edges
 
         num = int(input("Enter number of vertices: "))
 
@@ -18,7 +80,7 @@ class Graph():
 
             print("Creating complete graph")
 
-            return Graph.new_complete(num)
+            return DirectedGraph.new_complete(num)
 
         for x in range(edge_no):
 
@@ -27,13 +89,13 @@ class Graph():
 
             edges.add((a,b))
         
-        return Graph(num, *edges)
+        return DirectedGraph(num, *edges)
 
     def new_complete(n):
 
         edges = {(a,b) for a in range(n) for b in range(n) if a != b}
 
-        return Graph(n, *edges)
+        return DirectedGraph(n, *edges)
     
     def __init__(self, num_vertices, *edges):
         
@@ -289,12 +351,45 @@ class Graph():
                  print(f"{end} | No path")
 
         
+class UndirectedGraph(DirectedGraph):
 
+    def from_console():
+
+        # Takes input for directed edges
+
+        num = int(input("Enter number of vertices: "))
+
+        edges = set()
         
-                
+        edge_no = int(input("Enter number of edges: "))
 
-g = Graph.from_console()
+        if edge_no >= num * (num-1):
+
+            print("Creating complete graph")
+
+            return UndirectedGraph.new_complete(num)
+
+        for x in range(edge_no):
+
+            a = int(input(f"Edge {x+1} Start: "))
+            b = int(input(f"Edge {x+1} End: "))
+
+            edges.add((a,b))
+            edges.add((b,a))
+        
+        return UndirectedGraph(num, *edges)
+
+    def new_complete(n):
+
+        edges = {(a,b) for a in range(n) for b in range(n) if a != b}
+
+        return UndirectedGraph(n, *edges)
+
+g = UndirectedGraph.from_console()
+
+print(g)
 
 g.print_list()
+g.print_matrix()
 
 g.print_all_shortest_paths_from_node()
