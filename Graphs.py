@@ -193,22 +193,40 @@ class DirectedGraph(Graph):
             paths.append((pair, self.get_shortest_path(*pair)))
         
         return paths
-    
+
     def dfs(self, start=0):
 
-        adj_list = self.adj_list()
-
-        visit_stack = Stack()
-        visit_stack.push(start)
         visited = []
         is_visited = [False] * self._num_vertices
         starts = [None] * self._num_vertices
         ends = [None] * self._num_vertices
         parents = [None] * self._num_vertices
 
-        counter = 0
+        visited, starts, ends, parents = \
+            self._component_dfs(start, visited, is_visited, starts, ends, parents)
 
-        self.print_list()
+        while len(visited) < self._num_vertices:
+
+            next_start = 0
+
+            while is_visited[next_start]:
+
+                next_start += 1
+
+            cur_start = next_start
+
+            self._component_dfs(cur_start, visited, is_visited, starts, ends, parents)
+
+        return visited, starts, ends, parents
+    
+    def _component_dfs(self, start, visited, is_visited, starts, ends, parents):
+
+        adj_list = self.adj_list()
+
+        visit_stack = Stack()
+        visit_stack.push(start)
+
+        counter = 0
 
         while not visit_stack.is_empty():
 
@@ -231,52 +249,30 @@ class DirectedGraph(Graph):
                 
                 if len(others) == 0:
                 
-                    parent = parents[current]
-                    child = current
+                    cur = current
 
-                    ends[current] = counter
-                    counter += 1
+                    cur_finished = True
 
-                    valid_parent = True
+                    while cur_finished:
 
-                    if parent is not None:
-
-                        for p in adj_list[child]:
-
-                            print(child, p, adj_list)
-
-                            if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
-
-                                adj_list[p].pop()
-                            
-                            elif len(adj_list[p]) > 0:
-
-                                if p == parent:
-
-                                    valid_parent = False
-                    
-                    while parent is not None and valid_parent:
-
-                        ends[parent] = counter
+                        ends[cur] = counter
                         counter += 1
 
-                        child = parent
-                        parent = parents[child]
+                        cur = parents[cur]
 
-                        for p in adj_list[child]:
+                        if cur is None:
 
-                            print(child, p, adj_list)
+                            cur_finished = False
 
-                            if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
+                        else:
 
-                                adj_list[p].pop()
-                            
-                            elif len(adj_list[p]) > 0:
+                            for neighbour in adj_list[cur]:
 
-                                if p == parent:
+                                if neighbour != parents[cur] and \
+                                        not is_visited[neighbour] and \
+                                        ends[neighbour] is None:
 
-                                    valid_parent = False
-                        
+                                    cur_finished = False
         
         return visited, starts, ends, parents
 
@@ -549,7 +545,9 @@ class DirectedWeightedGraph(DirectedGraph):
         print("\n")
 
 
-g = DirectedWeightedGraph.from_console()
+g = UndirectedGraph.from_console()
 
 g.print_list()
 g.print_matrix()
+
+print(g.dfs())
