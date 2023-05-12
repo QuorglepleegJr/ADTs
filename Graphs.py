@@ -99,20 +99,20 @@ class DirectedGraph(Graph):
     
     def __init__(self, num_vertices, *edges):
         
-        self.__num_vertices = num_vertices
-        self.__edges = set(edges)
+        self._num_vertices = num_vertices
+        self._edges = set(edges)
     
     def bfs(self, start=0):
 
         adj_list = self.adj_list()
 
-        visit_q = LinearQueue(self.__num_vertices)
+        visit_q = LinearQueue(self._num_vertices)
         visit_q.enqueue(start)
         visited = [start]
-        is_visited = [False] * self.__num_vertices
-        distances = [inf] * self.__num_vertices
+        is_visited = [False] * self._num_vertices
+        distances = [inf] * self._num_vertices
         distances[start] = 0
-        parents = [None] * self.__num_vertices
+        parents = [None] * self._num_vertices
 
 
         while not visit_q.is_empty():
@@ -155,7 +155,7 @@ class DirectedGraph(Graph):
 
         paths = []
 
-        for end in range(self.__num_vertices):
+        for end in range(self._num_vertices):
 
             if end != start:
 
@@ -183,8 +183,8 @@ class DirectedGraph(Graph):
 
     def get_all_shortest_paths(self):
 
-        pairs = [(a,b) for a in range(self.__num_vertices) \
-            for b in range(self.__num_vertices) if a != b]
+        pairs = [(a,b) for a in range(self._num_vertices) \
+            for b in range(self._num_vertices) if a != b]
         
         paths = []
 
@@ -201,10 +201,10 @@ class DirectedGraph(Graph):
         visit_stack = Stack()
         visit_stack.push(start)
         visited = []
-        is_visited = [False] * self.__num_vertices
-        starts = [None] * self.__num_vertices
-        ends = [None] * self.__num_vertices
-        parents = [None] * self.__num_vertices
+        is_visited = [False] * self._num_vertices
+        starts = [None] * self._num_vertices
+        ends = [None] * self._num_vertices
+        parents = [None] * self._num_vertices
 
         counter = 0
 
@@ -243,17 +243,17 @@ class DirectedGraph(Graph):
 
                         for p in adj_list[child]:
 
-                                print(child, p, adj_list)
+                            print(child, p, adj_list)
 
-                                if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
+                            if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
 
-                                    adj_list[p].pop()
-                                
-                                elif len(adj_list[p]) > 0:
+                                adj_list[p].pop()
+                            
+                            elif len(adj_list[p]) > 0:
 
-                                    if p == parent:
+                                if p == parent:
 
-                                        valid_parent = False
+                                    valid_parent = False
                     
                     while parent is not None and valid_parent:
 
@@ -282,9 +282,9 @@ class DirectedGraph(Graph):
 
     def matrix(self):
 
-        m = [[0]*self.__num_vertices for _ in range(self.__num_vertices)]
+        m = [[0]*self._num_vertices for _ in range(self._num_vertices)]
 
-        for edge in self.__edges:
+        for edge in self._edges:
 
             m[edge[0]][edge[1]] = 1
         
@@ -292,9 +292,9 @@ class DirectedGraph(Graph):
 
     def adj_list(self):
 
-        l = [[] for _ in range(self.__num_vertices)]
+        l = [[] for _ in range(self._num_vertices)]
 
-        for edge in self.__edges:
+        for edge in self._edges:
 
             l[edge[0]].append(edge[1])
         
@@ -308,23 +308,23 @@ class DirectedGraph(Graph):
 
         print("\nMatrix:\n")
 
-        print(" "+" "*len(str(self.__num_vertices))+"| ", end="")
+        print(" "+" "*len(str(self._num_vertices))+"| ", end="")
 
-        for x in range(self.__num_vertices):
+        for x in range(self._num_vertices):
 
             print(str(x)+" ", \
-                end=" "*(len(str(self.__num_vertices))-len(str(x))))
+                end=" "*(len(str(self._num_vertices))-len(str(x))))
         
-        print("\n"+"-"*((len(str(self.__num_vertices))+1)*self.__num_vertices+3))
+        print("\n"+"-"*((len(str(self._num_vertices))+1)*self._num_vertices+3))
 
         for index, row in enumerate(self.matrix()):
 
-            print(str(index)+" "*(len(str(self.__num_vertices))-len(str(index)))\
+            print(str(index)+" "*(len(str(self._num_vertices))-len(str(index)))\
                   + " | ", end="")
             
             for item in row:
                 
-                print(str(item)+" "*(len(str(self.__num_vertices))), end="")
+                print(str(item)+" "*(len(str(self._num_vertices))), end="")
             
             print()
         
@@ -336,7 +336,7 @@ class DirectedGraph(Graph):
 
         for index, connections in enumerate(self.adj_list()):
 
-            print(str(index) + " "*(len(str(self.__num_vertices)) \
+            print(str(index) + " "*(len(str(self._num_vertices)) \
                 - len(str(index))) + " | ", end="")
             print(*connections, sep=", ")
         
@@ -454,27 +454,102 @@ class DirectedWeightedGraph(DirectedGraph):
 
             print("Creating complete graph")
 
-            return UndirectedGraph.new_complete(num)
+            return DirectedWeightedGraph.new_complete(num)
 
         for x in range(edge_no):
 
             a = int(input(f"Edge {x+1} Start: "))
             b = int(input(f"Edge {x+1} End: "))
+            w = int(input(f"Edge {x+1} Weight: "))
 
-            edges.add((a,b))
-            edges.add((b,a))
+            edges.add((a,b,w))
         
-        return UndirectedGraph(num, *edges)
+        return DirectedWeightedGraph(num, *edges)
 
     def new_complete(n):
 
-        edges = {(a,b) for a in range(n) for b in range(n) if a != b}
+        edges = [(a,b) for a in range(n) for b in range(n) if a != b]
+        weighted_edges = {}
 
-        return UndirectedGraph(n, *edges)
+        for edge in edges:
 
-g = UndirectedGraph.from_console()
+            weighted_edges.add((edge[0], edge[1], \
+                int(input(f"Edge {edge[0]} -> {edge[1]} Weight: "))))
+        
+        return DirectedWeightedGraph(n, *weighted_edges)
+    
+    def _get_weights(self):
+
+        weights = []
+
+        for edge in self._edges:
+
+            weights.append(edge[2])
+        
+        return weights
+    
+    def adj_list(self):
+
+        l = [[] for _ in range(self._num_vertices)]
+
+        for edge in self._edges:
+
+            l[edge[0]].append((edge[1], edge[2]))
+        
+        for connections in l:
+
+            connections.sort(key = lambda arr: arr[0])
+        
+        return l
+
+    def matrix(self):
+
+        m = [[inf]*self._num_vertices for _ in range(self._num_vertices)]
+
+        for n in range(self._num_vertices):
+
+            m[n][n] = 0
+
+        for edge in self._edges:
+
+            m[edge[0]][edge[1]] = edge[2]
+        
+        return m
+
+    def print_matrix(self):
+
+        max_len = max(self._get_weights())
+
+        print("\nMatrix:\n")
+
+        print(" "+" "*len(str(self._num_vertices))+"| ", end="")
+
+        for x in range(self._num_vertices):
+
+            if x == inf:
+
+                x = "i"
+
+            print(" "*(max_len-len(str(x))) + str(x)+" ", \
+                end=" "*(len(str(self._num_vertices))-len(str(x))))
+        
+        print("\n"+"-"*((len(str(self._num_vertices))+1)*self._num_vertices+3))
+
+        for index, row in enumerate(self.matrix()):
+
+            print(str(index)+" "*(len(str(self._num_vertices))-len(str(index)))\
+                  + " | ", end="")
+            
+            for item in row:
+                
+                print(str(item)+" "*(len(str(self._num_vertices))), end="")
+            
+            print()
+        
+        print("\n")
+
+
+g = DirectedWeightedGraph.from_console()
 
 g.print_list()
 g.print_matrix()
-
-print(g.dfs())
