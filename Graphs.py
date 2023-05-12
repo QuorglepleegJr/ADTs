@@ -109,6 +109,7 @@ class DirectedGraph(Graph):
         visit_q = LinearQueue(self.__num_vertices)
         visit_q.enqueue(start)
         visited = [start]
+        is_visited = [False] * self.__num_vertices
         distances = [inf] * self.__num_vertices
         distances[start] = 0
         parents = [None] * self.__num_vertices
@@ -120,9 +121,10 @@ class DirectedGraph(Graph):
 
             for other in adj_list[current]:
                 
-                if not other in visited:
+                if not is_visited[other]:
 
                     visited.append(other)
+                    is_visited[other] = True
                     visit_q.enqueue(other)
                     distances[other] = distances[current] + 1
                     parents[other] = current
@@ -199,6 +201,7 @@ class DirectedGraph(Graph):
         visit_stack = Stack()
         visit_stack.push(start)
         visited = []
+        is_visited = [False] * self.__num_vertices
         starts = [None] * self.__num_vertices
         ends = [None] * self.__num_vertices
         parents = [None] * self.__num_vertices
@@ -211,14 +214,15 @@ class DirectedGraph(Graph):
 
             current = visit_stack.pop()
 
-            if current not in visited:
+            if not is_visited[current]:
 
                 starts[current] = counter
                 counter += 1
 
                 visited.append(current)
+                is_visited[current] = True
 
-                others = [x for x in adj_list[current] if x not in visited]
+                others = [x for x in adj_list[current] if not is_visited[x]]
                 
                 for i in range(len(others)-1, -1, -1):
 
@@ -232,9 +236,33 @@ class DirectedGraph(Graph):
 
                     ends[current] = counter
                     counter += 1
+
+                    valid_parent = True
+
+                    if parent is not None:
+
+                        for p in adj_list[child]:
+
+                                print(child, p, adj_list)
+
+                                if len(adj_list[p]) > 0 and child == adj_list[p][-1]:
+
+                                    adj_list[p].pop()
+                                
+                                elif len(adj_list[p]) > 0:
+
+                                    if p == parent:
+
+                                        valid_parent = False
                     
-                    while parent is not None:
-                        
+                    while parent is not None and valid_parent:
+
+                        ends[parent] = counter
+                        counter += 1
+
+                        child = parent
+                        parent = parents[child]
+
                         for p in adj_list[child]:
 
                             print(child, p, adj_list)
@@ -247,13 +275,7 @@ class DirectedGraph(Graph):
 
                                 if p == parent:
 
-                                    break
-
-                        ends[parent] = counter
-                        counter += 1
-
-                        child = parent
-                        parent = parents[child]
+                                    valid_parent = False
                         
         
         return visited, starts, ends, parents
@@ -363,10 +385,60 @@ class DirectedGraph(Graph):
 
         paths = self.get_all_shortest_paths()
 
-        for path A
+        print("\nAll shortest paths between every pair of nodes:\n")
+
+        for path in paths:
+
+            print(f"{path[0][0]} -> {path[0][1]} | ", end="") 
+
+            if path[1][0] == inf:
+
+                print("No path")
+
+            else:
+                print(f"{path[1][0]} | ", end="")
+                print(" -> ".join([str(n) for n in path[1][1]]))
+        
+        print()
+
+    # Missing functions: Full dfs, print dfs order
 
         
 class UndirectedGraph(DirectedGraph):
+
+    def from_console():
+
+        # Takes input for UNdirected edges
+
+        num = int(input("Enter number of vertices: "))
+
+        edges = set()
+        
+        edge_no = int(input("Enter number of edges: "))
+
+        if edge_no * 2 >= num * (num-1):
+
+            print("Creating complete graph")
+
+            return UndirectedGraph.new_complete(num)
+
+        for x in range(edge_no):
+
+            a = int(input(f"Edge {x+1} Start: "))
+            b = int(input(f"Edge {x+1} End: "))
+
+            edges.add((a,b))
+            edges.add((b,a))
+        
+        return UndirectedGraph(num, *edges)
+
+    def new_complete(n):
+
+        edges = {(a,b) for a in range(n) for b in range(n) if a != b}
+
+        return UndirectedGraph(n, *edges)
+
+class DirectedWeightedGraph(DirectedGraph):
 
     def from_console():
 
@@ -405,4 +477,4 @@ g = UndirectedGraph.from_console()
 g.print_list()
 g.print_matrix()
 
-print(g.get_all_shortest_paths())
+print(g.dfs())
