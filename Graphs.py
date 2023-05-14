@@ -1,4 +1,4 @@
-from Queues import LinearQueue
+from Queues import LinearQueue, HeapPriorityQueue
 from Stacks import Stack
 from math import inf
 
@@ -465,7 +465,7 @@ class DirectedWeightedGraph(DirectedGraph):
     def new_complete(n):
 
         edges = [(a,b) for a in range(n) for b in range(n) if a != b]
-        weighted_edges = {}
+        weighted_edges = set()
 
         for edge in edges:
 
@@ -483,6 +483,44 @@ class DirectedWeightedGraph(DirectedGraph):
             weights.append(edge[2])
         
         return weights
+
+    def dijkstra(self, start=0):
+
+        visit_q = HeapPriorityQueue(len(self._edges))
+
+        adj_list = self.adj_list()
+
+        distances = [inf] * self._num_vertices
+        distances[0] = 0
+
+        parents = [None] * self._num_vertices
+
+        final = [False] * self._num_vertices
+
+        visit_q.enqueue((start, 0))
+
+        while not visit_q.is_empty():
+
+            current = visit_q.dequeue()
+
+            for adj in adj_list[current]:
+
+                if not final[adj[0]]:
+
+                    if distances[current] + adj[1] < distances[adj[0]]:
+
+                        distances[adj[0]] = distances[current] + adj[1]
+
+                        visit_q.enqueue((adj[0], -distances[adj[0]]))
+                        # Negative ensures the highest priority is the lowest distance
+                        
+                    parents[adj[0]] = current
+
+                    final[current] = True
+            
+            print(distances, parents, current)
+        
+        return distances, parents
     
     def adj_list(self):
 
@@ -514,7 +552,8 @@ class DirectedWeightedGraph(DirectedGraph):
 
     def print_matrix(self):
 
-        max_len = max(self._get_weights())
+        max_len = max([len(str(w)) for w in self._get_weights() + \
+            [x for x in range(self._num_vertices)]])
 
         print("\nMatrix:\n")
 
@@ -522,32 +561,74 @@ class DirectedWeightedGraph(DirectedGraph):
 
         for x in range(self._num_vertices):
 
-            if x == inf:
-
-                x = "i"
-
-            print(" "*(max_len-len(str(x))) + str(x)+" ", \
-                end=" "*(len(str(self._num_vertices))-len(str(x))))
+            print(" "*(max_len-len(str(x))) + str(x), end=" ")
         
-        print("\n"+"-"*((len(str(self._num_vertices))+1)*self._num_vertices+3))
+        print("\n"+"-"*((max_len+1)*self._num_vertices+\
+            len(str(self._num_vertices))+2))
 
         for index, row in enumerate(self.matrix()):
 
-            print(str(index)+" "*(len(str(self._num_vertices))-len(str(index)))\
+            print(" "*(len(str(self._num_vertices))-len(str(index)))+str(index)\
                   + " | ", end="")
             
             for item in row:
+
+                if item == inf:
+
+                    item = "\u221E"
                 
-                print(str(item)+" "*(len(str(self._num_vertices))), end="")
+                print(" "*(max_len-len(str(item))) + str(item), end=" ")
             
             print()
         
         print("\n")
 
+class UndirectedWeightedGraph(DirectedWeightedGraph):
 
-g = UndirectedGraph.from_console()
+    def from_console():
+
+        # Takes input for directed edges
+
+        num = int(input("Enter number of vertices: "))
+
+        edges = set()
+        
+        edge_no = int(input("Enter number of edges: "))
+
+        if edge_no * 2 >= num * (num-1):
+
+            print("Creating complete graph")
+
+            return UndirectedWeightedGraph.new_complete(num)
+
+        for x in range(edge_no):
+
+            a = int(input(f"Edge {x+1} Start: "))
+            b = int(input(f"Edge {x+1} End: "))
+            w = int(input(f"Edge {x+1} Weight: "))
+
+            edges.add((a,b,w))
+            edges.add((b,a,w))
+        
+        return UndirectedWeightedGraph(num, *edges)
+
+    def new_complete(n):
+
+        pairs = [(a,b) for a in range(n) for b in range(a, n)]
+        edges = set()
+
+        for pair in pairs:
+
+            w = int(input(f"Edge {pair[0]} <-> {pair[1]} Weight: "))
+
+            edges.add(pair[0], pair[1], w)
+            edges.add(pair[1], pair[0], w)
+
+        return UndirectedWeightedGraph(n, *edges)
+
+g = UndirectedWeightedGraph.from_console()
 
 g.print_list()
 g.print_matrix()
 
-print(g.dfs())
+print(g.dijkstra())
