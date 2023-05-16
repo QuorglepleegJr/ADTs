@@ -514,11 +514,9 @@ class DirectedWeightedGraph(DirectedGraph):
                         visit_q.enqueue((adj[0], -distances[adj[0]]))
                         # Negative ensures the highest priority is the lowest distance
                         
-                    parents[adj[0]] = current
+                        parents[adj[0]] = current
 
-                    final[current] = True
-            
-            print(distances, parents, current)
+            final[current] = True
         
         return distances, parents
     
